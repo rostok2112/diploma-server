@@ -10,8 +10,13 @@ class BLDevice:
         self.client = None
         self.characteristic_uuid = None
 
+    
+    @property
+    def has_connection(self) -> bool:
+        return self.client and self.client.is_connected
+        
     async def connect(self):
-        if not self.client or not self.client.is_connected:
+        if not self.has_connection:
             print(f"Trying to connect to {self.name} device...")
             device = await BleakScanner.find_device_by_name(self.name, timeout=20.0)
             if device is None:
@@ -61,7 +66,7 @@ class BLDevice:
         print(f"Message '{message}' written to characteristic({self.characteristic_uuid})")
 
     async def disconnect(self):
-        if self.client and self.client.is_connected:
+        if self.has_connection:
             await self.client.stop_notify(
                 await self.get_writable_char_uuid()
             )
@@ -77,6 +82,8 @@ async def main():
     print("\n\nPress Ctrl-C to exit...\n\n")
     try:
         while True:
+            if not my_device.has_connection:
+                raise KeyboardInterrupt
             await asyncio.sleep(1)
     except KeyboardInterrupt:
         await my_device.disconnect()
