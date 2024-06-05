@@ -13,6 +13,7 @@ Initialization:
 
 ```bash
 pipenv sync
+cat .env.sample > .env
 ```
 
 Run:

@@ -1,9 +1,10 @@
 import asyncio
 from bleak import BleakScanner, BleakClient
+import settings
 
  
 class BLDevice:
-    def __init__(self, name: str):
+    def __init__(self, name: str = settings.FBT_MODULE_NAME):
         self.name = name
         self.client = None
         self.characteristic_uuid = None
@@ -53,9 +54,7 @@ class BLDevice:
             print(f"Disconnected from {self.name}")
 
 if __name__ == '__main__':
-    NAME = "FBT(@Dr00L)"
-
-    my_device = BLDevice(NAME)
+    my_device = BLDevice()
     loop = asyncio.get_event_loop()
 
     # Write to the characteristic
