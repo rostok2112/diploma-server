@@ -9,7 +9,7 @@ class BLDevice:
         self.characteristic_uuid = None
 
     async def connect(self):
-        if not self.client:
+        if not self.client or not self.client.is_connected:
             print(f"Trying to connect to {self.name} device...")
             device = await BleakScanner.find_device_by_name(self.name, timeout=20.0)
             if device is None:
@@ -21,15 +21,13 @@ class BLDevice:
             print(f"Paired with {self.name}")
 
     async def get_writable_char_uuid(self):
-        if not self.client:
-            await self.connect()
+        await self.connect()
         if not self.characteristic_uuid:
-            services = await self.client.get_services()
-            for service in services:
+            for service in self.client.services:
                 for char in service.characteristics:
                     properties = set(char.properties)
                     # in current circumstanse (original HM-10 ble module with latest firmware), 
-                    # in this way we can fiund a characteristic uuid that can be used for write
+                    # in this way we can find a RX/TX characteristic uuid
                     if properties.issuperset({'read', 'write-without-response', 'write', 'notify', 'indicate'}):
                         self.characteristic_uuid = char.uuid
                         print(f"Found writable characteristic: {char.uuid}")
@@ -55,7 +53,7 @@ class BLDevice:
             print(f"Disconnected from {self.name}")
 
 if __name__ == '__main__':
-    NAME = "baze"
+    NAME = "FBT(@Dr00L)"
 
     my_device = BLDevice(NAME)
     loop = asyncio.get_event_loop()
