@@ -1,5 +1,6 @@
 import asyncio
 from bleak import BleakScanner, BleakClient
+from bleak.backends.characteristic import BleakGATTCharacteristic
 import settings
 
  
@@ -28,7 +29,7 @@ class BLDevice:
                 for char in service.characteristics:
                     properties = set(char.properties)
                     # in current circumstanse (original HM-10 ble module with latest firmware), 
-                    # in this way we can find a RX/TX characteristic uuid
+                    # in this way we can find a Rx/Tx characteristic uuid
                     if properties.issuperset({'read', 'write-without-response', 'write', 'notify', 'indicate'}):
                         self.characteristic_uuid = char.uuid
                         print(f"Found writable characteristic: {char.uuid}")
@@ -36,6 +37,17 @@ class BLDevice:
                 raise Exception("No writable characteristic found.")
         return self.characteristic_uuid
 
+    async def start_char_notify_handle(self):
+        def notify_handler(charact: BleakGATTCharacteristic, data: bytearray):
+            """Simple notification handler which prints the data received."""
+            print(f"Got notification about change of `{charact.description}` characteristic({charact.uuid}): `{data.decode('utf-8')}`")
+        print(f"Starting notification handle from characteristic({await self.get_writable_char_uuid()})")
+        
+        await self.client.start_notify(
+            self.characteristic_uuid, 
+            notify_handler
+        )
+        
     async def write(self, message):
         await self.connect()
         try:
@@ -46,19 +58,28 @@ class BLDevice:
         except Exception as e:
             print("Got an error while writing: ", e)
             return
-        print(f"Message '{message}' written to characteristic {self.characteristic_uuid}")
+        print(f"Message '{message}' written to characteristic({self.characteristic_uuid})")
 
     async def disconnect(self):
         if self.client and self.client.is_connected:
+            await self.client.stop_notify(
+                await self.get_writable_char_uuid()
+            )
             await self.client.disconnect()
             print(f"Disconnected from {self.name}")
 
-if __name__ == '__main__':
+async def main():
     my_device = BLDevice()
-    loop = asyncio.get_event_loop()
+    
+    await my_device.write("Successfully connected from Server !")
+    await my_device.start_char_notify_handle()
+    
+    print("\n\nPress Ctrl-C to exit...\n\n")
+    try:
+        while True:
+            await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        await my_device.disconnect()
 
-    # Write to the characteristic
-    loop.run_until_complete(my_device.write("hello world!"))
-
-    # Disconnect (optional, good practice to disconnect when done)
-    loop.run_until_complete(my_device.disconnect())
+if __name__ == '__main__':
+    asyncio.run(main())
