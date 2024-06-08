@@ -45,7 +45,7 @@ class BLDevice:
     async def start_char_notify_handle(self):
         def notify_handler(charact: BleakGATTCharacteristic, data: bytearray):
             """Simple notification handler which prints the data received."""
-            print(f"Got notification about change of `{charact.description}` characteristic({charact.uuid}): `{data.decode('utf-8')}`")
+            print(f"Got notification about change of `{charact.description}` characteristic({charact.uuid}): `{data}`")
         print(f"Starting notification handle from characteristic({await self.get_writable_char_uuid()})")
         
         await self.client.start_notify(
