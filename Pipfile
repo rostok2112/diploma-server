@@ -6,6 +6,11 @@ name = "pypi"
 [packages]
 bleak = "*"
 python-environ = "*"
+redis = "*"
+rq-win = {git = "git+https://github.com/michaelbrooks/rq-win.git#egg=rq-win"}
+rq = "*"
+websockets = "*"
+numba = "*"
 
 [dev-packages]
 

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket 3D Visualization</title>
+    <style>
+        body { margin: 0; background-color: black; color: purple; font-family: Arial, sans-serif; }
+        #messages { position: absolute; top: 10px; left: 10px; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <div id="messages"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // WebSocket connection
+        const socket = new WebSocket("ws://localhost:8001"); // Замените на адрес вашего сервера WebSocket
+
+        socket.onopen = function(event) {
+            console.log("Соединение установлено");
+        };
+
+        socket.onmessage = function(event) {
+            console.log("Сообщение получено:", event.data);
+            const data = JSON.parse(event.data);
+            updateObjectRotation(data.r, data.p, data.y);
+            displayMessage(data.r, data.p, data.y);
+        };
+
+        socket.onclose = function(event) {
+            console.log("Соединение закрыто");
+        };
+
+        function displayMessage(roll, pitch, yaw) {
+            const messagesDiv = document.getElementById("messages");
+            messagesDiv.innerHTML = `Roll: ${roll.toFixed(2)}, Pitch: ${pitch.toFixed(2)}, Yaw: ${yaw.toFixed(2)}`;
+        }
+
+        // Three.js setup
+        let scene, camera, renderer, cube;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            const geometry = new THREE.BoxGeometry();
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            camera.position.z = 5;
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        function updateObjectRotation(roll, pitch, yaw) {
+            // Умножим углы на коэффициент для более быстрого вращения
+            const speedMultiplier = 5;
+
+            const rollRad = THREE.MathUtils.degToRad(roll * speedMultiplier);
+            const pitchRad = THREE.MathUtils.degToRad(pitch * speedMultiplier);
+            const yawRad = THREE.MathUtils.degToRad(yaw * speedMultiplier);
+
+            // Устанавливаем текущий наклон объекта
+            cube.rotation.x = pitchRad;
+            cube.rotation.y = yawRad;
+            cube.rotation.z = rollRad;
+        }
+
+        init();
+    </script>
+</body>
+</html>
