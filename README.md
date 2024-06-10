@@ -14,14 +14,19 @@ Initialization:
 ```bash
 pipenv sync
 cat .env.sample > .env
+docker compose up -d
 ```
 
 Run:
 
 ```bash
-pipenv run python src/main.py
+pipenv run python src/ble_main.py
+pipenv run python src/worker_main.py
+pipenv run python src/ws_main.py
 ```
 
 Exit:
 
 `CTRL + C`
+
+Optionally run test web app by opening `src/test_web_app.html`
