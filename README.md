@@ -7,7 +7,7 @@ Server side of [FBT module project](https://github.com/rostok2112/diploma)
 
 Dependencies:
 - pipenv
-
+- docker (for running some binary stuff)
 
 Initialization:
 
