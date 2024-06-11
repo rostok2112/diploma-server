@@ -25,8 +25,10 @@ pipenv run python src/worker_main.py
 pipenv run python src/ws_main.py
 ```
 
+Or run `VS code` build task by `CTRL + SHIFT + B` -> `0. Run all servers and workers` -> `ENTER`
+
 Exit:
 
-`CTRL + C`
+`CTRL + C` on every opened terminal
 
 Optionally run test web app by opening `src/test_web_app.html`

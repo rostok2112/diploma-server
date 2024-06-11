@@ -1,0 +1,60 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "0. Run all servers and workers",
+            "dependsOn": [
+                "1. Run Bluetooth server",
+                "2. Run Tasks Worker",
+                "3. Run WebSocket server"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "group": "develop",
+                "reveal": "always",
+            }
+        },
+        {
+            "label": "1. Run Bluetooth server",
+            "type": "shell",
+            "command": "pipenv run python src/ble_main.py",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "group": "develop",
+                "reveal": "always"
+            }
+        },
+        {
+            "label": "2. Run Tasks Worker",
+            "type": "shell",
+            "command": "pipenv run python src/worker_main.py",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "group": "develop",
+                "reveal": "always"
+            }
+        },
+        {
+            "label": "3. Run WebSocket server",
+            "type": "shell",
+            "command": "pipenv run python src/ws_main.py",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "group": "develop"
+            }
+        },
+    ]
+}
