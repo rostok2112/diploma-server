@@ -164,3 +164,6 @@ cython_debug/
 #redis-local
 redis_data/*
 !redis_data/.gitkeep
+
+#Pipenv
+Pipfile.lock
