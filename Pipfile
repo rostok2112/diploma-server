@@ -10,6 +10,7 @@ redis = "*"
 websockets = "*"
 numba = "*"
 numpy = "*"
+async-timeout = "*"
 
 [dev-packages]
 
